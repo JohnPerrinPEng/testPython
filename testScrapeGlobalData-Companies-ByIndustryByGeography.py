@@ -7,14 +7,48 @@ URL = "https://www.globaldata.com/companies/listing/search/?location=16220&indus
 
 r = get(URL)
 
-soup = BeautifulSoup(r.text,"lxml")
+soup = BeautifulSoup(r.content,"html.parser")
+
+# lock_tags = soup.find_all('lock-box')
+# print(lock_tags)
+
+# for locks in lock_tags:
+#     locks.span.decompose()
+
+# soup = BeautifulSoup(r.text,"lxml")
 # soup.find('div', id="lock-box").decompose()
+# soup.contents.find_all('div','lock-box')
 
 
-# soup = soup.find('div',class_='lock-box').decompose()
+element = soup.find('div', class_='lock-box')
+print(element)
+if element and 'class' in element.attrs:
+    # Split the class attribute into individual classes
+    classes = element['class']
+    # .split()
+
+    # Remove the desired class (e.g., 'my-class')
+    if 'lock-box' in classes:
+        classes.remove('my-class')
+
+    # Join the modified classes back into a string
+    new_class = ' '.join(classes)
+
+    # Update the 'class' attribute of the element
+    element['class'] = new_class    
+print(element)
 
 # get all tables
 tables = soup.find_all('tbody')
+
+# for result in soup.findAll('a'):
+#     with open('afile.csv','w') as f:
+#         csv_writer = writer(f)
+#         csv_writer.writerow(result)
+f = open('file.txt', 'w')
+f.write(soup.text)
+f.close()       
+
 
 # loop over each table
 for num, table in enumerate(tables, start=1):

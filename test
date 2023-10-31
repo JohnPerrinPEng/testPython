@@ -1,9 +1,0 @@
-from bs4 import BeautifulSoup
-
-markup = '<a>This is not div <div class="1">This is div 1</div><div class="lock-box">This is div lock-box</div></a>'
-soup = BeautifulSoup(markup,"html.parser")
-a_tag = soup
-
-soup.find('div',class_='lock-box').decompose()
-
-print(a_tag)
