@@ -1,66 +1,39 @@
 
 from requests import get
 from csv import writer
+import csv
 # import requests
 from bs4 import BeautifulSoup
+listURLs = []
+with open('20231025 Canada Mining+ URLs Only.csv') as f:
+    reader = csv.reader(f)
+    for row in reader:
+        print(row)
+        listURLs.append(row)
+f.close()
+# listURLs = csv.reader('listGlobalData-CompanyURLs.csv').text
 URL = "https://www.globaldata.com/company-profile/pan-american-silver-corp/executives/"
 
-r = get(URL)
+for item in listURLs:
+    URL = item[0]
+    print(URL)
+    r = get(URL)
 
-soup = BeautifulSoup(r.content,"html.parser")
+    soup = BeautifulSoup(r.content,"html.parser")
 
-# get all tables
-tables = soup.find_all('tbody')
+    # soup.find('div', class_="grid-x grid-margin-x grid-margin-y").select()
+    company = soup.find('title').text
+    companyend = company.find(' Executive')
+    company = company[:companyend]
+    people = soup.find_all(class_="card person unbound")
 
-# loop over each table
-for num, table in enumerate(tables, start=1):
-
-    # create filename
-    filename = 'table-%d.csv' % num
-
-    # open file for writing
-    with open(filename, 'w') as f:
-
-        # store rows here
-        data = []
-
-        # create csv writer object
+    filename = 'executives-%s.csv' %company
+    with open(filename,'w',newline='') as f:
         csv_writer = writer(f)
-
-        # go through each row
-        rows = table.find_all('tr')
-        for row in rows:
-
-            # write headers if any
-            headers = row.find_all('th')
-            if headers:
-                csv_writer.writerow([header.text.strip() for header in headers])
-
-            # write column items
-            columns = row.find_all('td')
+        for person in people:
+            columns = person.find_all(True, {'class':['name','position','position-type']})
+            # row = ""
+            # for column in columns:
+            #     row = row + "," + column.text
+            #     print(row)
             csv_writer.writerow([column.text.strip() for column in columns])
-
-# print(tables)
-
-# s = scrapelib.Scraper(requests_per_minute=10)
-# page = s.get(URL)
-# print(page.text)
-
-
-# page = requests.get(URL)
-# soup = BeautifulSoup(page.content, "html.parser")
-
-# tables = soup.findAll("table")
-# print(tables.__annotations__)
-
-# for table in tables:
-#      if table.findParent("table") is None:
-#          print(str(table))
-
-# print(page.text)
-
-# # Didn't work for unknown reason
-# import pandas as pd
-# url = 'https://www.globaldata.com/companies/listing/search/?location=16220&industry=4800013&q[]=Canada%2520Mining&pageSize=100&pageNumber=1&sortColumn=1&sortDirection=asc'
-# dfs = pd.read_html(url)
-# print(len(dfs))
